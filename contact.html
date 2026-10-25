@@ -44,8 +44,7 @@
         <div class="contact-grid">
 
           <div>
-            <form action="https://formspree.io/f/xqpperer" method="POST">
-              <input type="hidden" name="_next" value="https://cleverlycontrived.com/thank-you.html">
+            <form id="contact-form">
               <div class="form-group">
                 <label for="name">Name</label>
                 <input type="text" id="name" name="name" required placeholder="Your name">
@@ -160,5 +159,38 @@
   </footer>
 
   <script src="js/main.js"></script>
+  <script>
+    document.getElementById('contact-form').addEventListener('submit', function(e) {
+      e.preventDefault();
+      var form = this;
+      var btn = form.querySelector('button[type="submit"]');
+      var originalText = btn.textContent;
+      btn.disabled = true;
+      btn.textContent = 'Sending…';
+
+      fetch('https://formspree.io/f/xqpperer', {
+        method: 'POST',
+        body: new FormData(form),
+        headers: { 'Accept': 'application/json' }
+      }).then(function(response) {
+        if (response.ok) {
+          window.location.href = 'thank-you.html';
+        } else {
+          throw new Error('Form submission failed');
+        }
+      }).catch(function() {
+        btn.disabled = false;
+        btn.textContent = originalText;
+        var msg = document.createElement('p');
+        msg.style.color = '#c0392b';
+        msg.style.marginTop = '1rem';
+        msg.textContent = 'Something went wrong. Please try again or email us directly.';
+        if (!form.querySelector('.form-error')) {
+          msg.className = 'form-error';
+          form.appendChild(msg);
+        }
+      });
+    });
+  </script>
 </body>
 </html>
